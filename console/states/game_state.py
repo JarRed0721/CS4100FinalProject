@@ -120,6 +120,7 @@ class GameState:
                             print(Color.YELLOW + "O" + Color.RESET, end="")
             print()
 
+    #checks if this square has a pawn in it
     def is_piece_occupied(self, i, j):
         index = i * self.cols + j
         return self.board[index] == BoardPieceStatus.OCCUPIED_BY_PLAYER_1 or self.board[
@@ -134,30 +135,36 @@ class GameState:
     def is_not_wall_occupied(self, i, j):
         return not self.is_wall_occupied(i, j)
 
+    #checks if a move is jumping over an opponent's pawn
     def is_jump(self, move):
         if self.player_one:
             return abs(self.player_one_pos[0] - move[0]) == 4
         else:
             return abs(self.player_two_pos[0] - move[0]) == 4
 
+    #checks if a move is a diagonal move
     def is_diagonal(self, move):
         if self.player_one:
             return abs(self.player_one_pos[0] - move[0]) == 2 and abs(self.player_one_pos[1] - move[1]) == 2
         else:
             return abs(self.player_two_pos[0] - move[0]) == 2 and abs(self.player_two_pos[1] - move[1]) == 2
 
+    #checks if a player is in their goal state
     def is_goal_state(self):
         if self.player_one:
             return self.player_one_pos[0] == 0
         else:
             return self.player_two_pos[0] == 16
 
+    #heuristic for how many squares to the goal row, ignoring any walls in the way
     def distance_to_goal(self):
         if self.player_one:
             return self.player_one_pos[0]
         else:
             return 16 - self.player_two_pos[0]
 
+    #gets all possible states from available pawn moves from this position and assigns them a cost
+    #based on how many squares get moved through
     def get_child_states_with_moves(self):
         available_moves = self.get_available_moves(False)
         children = []
@@ -178,6 +185,7 @@ class GameState:
             children.append((child, simplified_child_state))
         return children
 
+    #gets all moves this player can make from this state, pawn moves and wall placements
     def get_all_child_states(self, player_one_maximizer, include_state=True):
 
         children = []
@@ -414,6 +422,7 @@ class GameState:
         else:
             return None
 
+    #gets available pawn moves for this player
     def get_available_moves(self, include_state=True):
         north = self.get_north_pos(include_state)
         south = self.get_south_pos(include_state)
@@ -514,6 +523,7 @@ class GameState:
         self.player_one = player_one
         return not astar(self, True)
 
+    #include_state parameter determines whether return type includes game state or just positions
     def get_available_wall_placements_for_player_one(self, include_state=True):
         wall_placements = []
 
@@ -582,6 +592,7 @@ class GameState:
 
         return wall_placements
 
+    #include_state parameter determines whether return type includes game state or just positions
     def get_available_wall_placements_for_player_two(self, include_state=True):
         wall_placements = []
 
@@ -660,6 +671,8 @@ class GameState:
                     wall_placements.append(positions)
         return wall_placements
 
+    #performs an action on the game board, either on this version or a copy of the game in order to avoid mutation
+    #while evaluating future states
     def execute_action(self, action, execute_on_copy=True):
         if execute_on_copy:
             state = self.copy()
@@ -699,9 +712,11 @@ class GameState:
 
         self.board[old_i * self.cols + old_j] = BoardPieceStatus.FREE_PLAYER
 
+    #determines if game is over
     def is_end_state(self):
         return self.player_one_pos[0] == 0 or self.player_two_pos[0] == 16
 
+    #assuming game is over, tells the maximizing player if they won or not (1 or -1)
     def game_result(self, player_one_maximizer=False):
         if player_one_maximizer:
             if self.player_one_pos[0] == 0:
@@ -714,6 +729,7 @@ class GameState:
             else:
                 return -1
 
+    #determines which player won
     def get_winner(self):
         if self.player_one_pos[0] == 0:
             return "P1"
