@@ -185,7 +185,7 @@ class GameState:
             children.append((child, simplified_child_state))
         return children
 
-    #gets all moves this player can make from this state, pawn moves and wall placements
+    #gets all moves this player can make from this state, both pawn moves and wall placements
     def get_all_child_states(self, player_one_maximizer, include_state=True):
 
         children = []
