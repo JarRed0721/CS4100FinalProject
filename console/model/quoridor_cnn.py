@@ -1,5 +1,6 @@
 from console.states.game_state import BoardPieceStatus
 import torch 
+import torch.nn as nn
 import numpy as np
 
 def encodeState(gameState):
@@ -27,6 +28,63 @@ def encodeState(gameState):
 
 
     
+class QuoridorModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.reLU = nn.ReLU()
+        self.drop = nn.Dropout(0.3) # tune dropout rate depending on how model fits to data
+        self.conv1 = nn.Conv2d(7, 32, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
+        #we might not need third layer?
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
+        self.pool = nn.MaxPool2d(kernel_size=(3,3))
+
+        self.flatten = nn.Flatten()
+        self.linear = nn.Linear(3200, 256)
+
+        self.policy = nn.Linear(256, 132)
+
+        self.value_linear1 = nn.Linear(256, 64)
+        self.value_activation = nn.ReLU()
+        self.value_linear2 = nn.Linear(64, 1)
+        self.value_tanh = nn.Tanh() ## normalize output to [-1,1] to match game output labels
+    
+    def forward(self, x):
+        # input = 7x17x17, output = 32x17x17
+        x = self.conv1(x)
+        x = self.reLU(x)
+        x = self.drop(x)
+        # input = 32x17x17, output = 64x17x17
+        x = self.conv2(x)
+        x = self.reLU(x)
+        x = self.drop(x)
+        # input = 64x17x17, output = 128x17x17
+        x = self.conv3(x)
+        x = self.reLU(x)
+        x = self.drop(x)
+        # input = 128x17x17, output = 128x5x5
+        x = self.pool(x)
+        # input = 128x5x5, output = 3200
+        x = self.flatten(x)
+        # input = 3200, output = 256
+        x = self.linear(x)
+        x = self.reLU(x)
+
+        # input = 256, output = 132 (# of moves in Quorridor)
+        policy = self.policy(x)
+
+        #input = 256, output = 1
+        v = self.value_linear1(x)
+        v = self.value_activation(v)
+        v = self.value_linear2(v)
+        value = self.value_tanh(v)
+
+        return policy, value
+
+
+
+
+
 
     
 
