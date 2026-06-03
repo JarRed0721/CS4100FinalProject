@@ -2,14 +2,14 @@ from copy import copy
 from console.util.priority_queue_item import PriorityQueueItem
 from queue import PriorityQueue
 
-
+#direct distance ignoring walls to goal * 100 per square
 def simple_path_finding_heuristic(game_state):
     if game_state.player_one:
         return 100 * abs(game_state.player_one_pos[0])
     else:
         return 100 * (abs(game_state.player_two_pos[0] - 16))
 
-
+#A* algorithm to find shortest path to goal state
 def astar(game_state, check_blockage, heuristic=simple_path_finding_heuristic):
     visited = set()
 
