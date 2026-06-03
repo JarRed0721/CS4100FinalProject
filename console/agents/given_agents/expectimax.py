@@ -1,4 +1,4 @@
-from state_evaluation_heuristic import state_evaluation_heuristic
+from .state_evaluation_heuristic import state_evaluation_heuristic
 from console.states.game_state import GameState
 
 #Used in collecting training data, not written by our project group
