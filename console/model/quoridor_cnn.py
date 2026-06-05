@@ -2,6 +2,7 @@ from console.states.game_state import BoardPieceStatus
 import torch 
 import torch.nn as nn
 import numpy as np
+from torch.utils.data import Dataset
 
 def encodeState(gameState):
     grid = gameState.board
@@ -81,11 +82,28 @@ class QuoridorModel(nn.Module):
 
         return policy, value
 
+#pytorch dataloader needs a dataset to make batches with
+class QuoridorDataset(Dataset):
+    def __init__(self, data):
+        # flatten data from list of lists into a single list of samples
+        self.samples = [sample for game in data for sample in game]
 
+    def __len__(self):
+        # how many total samples exist
+        return len(self.samples)
 
+    def __getitem__(self, idx):
+        # DataLoader uses this with different indices to build batches
+        prev_state, player_num, action, eventual_winner = self.samples[idx]
 
+        state_tensor = encodeState(prev_state)          # (7, 17, 17) float32
 
+        # Convert winner to +1/-1 from the acting player's perspective for value head
+        value_target = 1.0 if player_num == eventual_winner else -1.0
 
-    
-
-    
+        return (
+            state_tensor,                                       # (7, 17, 17)
+            torch.tensor(action, dtype=torch.long),             # int, 0–131
+            torch.tensor(value_target, dtype=torch.float32),    # +1.0 or -1.0
+        )
+        
