@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 *.pyo
+game_data.json
+quoridor_model.pth

@@ -1,6 +1,6 @@
 import math
 from console.states.game_state import GameState
-from state_evaluation_heuristic import state_evaluation_heuristic
+from .state_evaluation_heuristic import state_evaluation_heuristic
 
 #Used in collecting training data, not written by our project group
 def minimax(game_state: GameState, depth, maximizing_player, player_one_minimax):

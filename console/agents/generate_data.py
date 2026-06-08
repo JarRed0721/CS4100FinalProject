@@ -1,6 +1,4 @@
-from console.states.game_state import GameState, Mappings
-from console.util.wall_direction import WallDirection
-from console.util.color import Color
+from console.states.game_state import GameState
 from console.agents.given_agents.minimax import minimax
 from console.agents.given_agents.minimax_ab_pruning import minimax_alpha_beta_pruning
 from console.agents.given_agents.expectimax import expectimax
@@ -15,22 +13,21 @@ def run_game_from_start():
 # returns a list of tuples formatted as (prev_state, player num, action, eventual_winner)
 def run_simulation_from_state(game: GameState):
     algorithms = [
-        "minimax",
         "minimax-alpha-beta-pruning",
         "expectimax",
         "monte-carlo-tree-search",
     ]
-    p1_alg = algorithms[random.randint(0, 3)]
-    p2_alg = algorithms[random.randint(0, 3)]
+    p1_alg = algorithms[random.randint(0, len(algorithms) - 1)]
+    p2_alg = algorithms[random.randint(0, len(algorithms) - 1)]
     results = []
 
     while not game.is_end_state():
         if game.player_one:
             action = player_simulation(game, 1, p1_alg)
-            results.append(game, 1, action, -1)
+            results.append((game, 1, action, -1))
         else:
             action = player_simulation(game, 2, p2_alg)
-            results.append(game, 2, action, -1)
+            results.append((game, 2, action, -1))
         game = game.execute_action(action)
 
     winner = int(game.get_winner()[1:])
@@ -48,11 +45,11 @@ def player_simulation(game_state: GameState, player_number, player_alg):
         maximizer = False
     action = (0, 0)
     if player_alg == "minimax":
-        return minimax_agent(maximizer, is_alpha_beta=False)
+        return minimax_agent(game_state, maximizer, is_alpha_beta=False)
     elif player_alg == "minimax-alpha-beta-pruning":
-        return minimax_agent(maximizer, is_alpha_beta=True)
+        return minimax_agent(game_state, maximizer, is_alpha_beta=True)
     elif player_alg == "expectimax":
-        return expectimax_agent(maximizer)
+        return expectimax_agent(game_state, maximizer)
     elif player_alg == "monte-carlo-tree-search":
         start = SearchNode(state=game_state, player_one_maximizer=maximizer)
         selected_node = start.best_action()

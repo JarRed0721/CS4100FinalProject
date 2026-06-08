@@ -1,6 +1,6 @@
 from console.states.game_state import GameState
 import math
-from state_evaluation_heuristic import state_evaluation_heuristic
+from .state_evaluation_heuristic import state_evaluation_heuristic
 
 #Used in collecting training data, not written by our project group
 def minimax_alpha_beta_pruning(game_state: GameState, depth, alpha, beta, maximizing_player, player_one_minimax):
