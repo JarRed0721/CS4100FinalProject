@@ -3,3 +3,4 @@ __pycache__/
 *.pyo
 game_data.json
 quoridor_model.pth
+analysis.txt
