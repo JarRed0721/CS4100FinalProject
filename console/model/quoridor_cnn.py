@@ -33,16 +33,15 @@ class QuoridorModel(nn.Module):
         super().__init__()
         self.reLU = nn.ReLU()
         self.drop = nn.Dropout(0.3) # tune dropout rate depending on how model fits to data
-        self.conv1 = nn.Conv2d(7, 32, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
-        #we might not need third layer?
-        self.conv3 = nn.Conv2d(64, 128, kernel_size=(3,3), padding=1) # might have to adjust num of out channels
+        self.conv1 = nn.Conv2d(7, 32, kernel_size=(3,3), padding=1) 
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=(3,3), padding=1) 
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=(3,3), padding=1) 
         self.pool = nn.MaxPool2d(kernel_size=(3,3))
 
         self.flatten = nn.Flatten()
         self.linear = nn.Linear(3200, 256)
 
-        self.policy = nn.Linear(256, 132)
+        self.policy = nn.Linear(256, 209)
 
         self.value_linear1 = nn.Linear(256, 64)
         self.value_activation = nn.ReLU()
@@ -70,7 +69,7 @@ class QuoridorModel(nn.Module):
         x = self.linear(x)
         x = self.reLU(x)
 
-        # input = 256, output = 132 (# of moves in Quorridor)
+        # input = 256, output = 209 (# of moves in Quorridor)
         policy = self.policy(x)
 
         #input = 256, output = 1
